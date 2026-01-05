@@ -6,7 +6,15 @@ export default function Home() {
       {/* Nav */}
       <nav className="fixed top-0 w-full border-b border-[var(--border)] bg-[var(--background)]/80 backdrop-blur-sm z-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="font-semibold text-lg">normalized</div>
+          <div className="flex items-center gap-2">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="10" height="10" rx="2" fill="var(--accent)" />
+              <rect x="18" y="4" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.6" />
+              <rect x="4" y="18" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.6" />
+              <rect x="18" y="18" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.3" />
+            </svg>
+            <span className="font-semibold text-lg">normalized</span>
+          </div>
           <div className="flex items-center gap-6">
             <Link href="/docs" className="text-[var(--muted)] hover:text-[var(--foreground)] transition-colors text-sm">
               Документация
@@ -171,7 +179,15 @@ const { url } = await db.storage
       {/* Footer */}
       <footer className="py-8 px-6 border-t border-[var(--border)]">
         <div className="max-w-6xl mx-auto flex items-center justify-between text-sm text-[var(--muted)]">
-          <div>normalized.ru</div>
+          <div className="flex items-center gap-2">
+            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="4" y="4" width="10" height="10" rx="2" fill="var(--accent)" />
+              <rect x="18" y="4" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.6" />
+              <rect x="4" y="18" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.6" />
+              <rect x="18" y="18" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.3" />
+            </svg>
+            normalized.ru
+          </div>
           <div className="flex items-center gap-6">
             <Link href="/docs" className="hover:text-[var(--foreground)]">Документация</Link>
             <Link href="/privacy" className="hover:text-[var(--foreground)]">Конфиденциальность</Link>
