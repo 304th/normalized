@@ -25,14 +25,21 @@ model Project {
   description String?
   region      String   @default("ru-msk")
 
-  // Database info (would be real connection in prod)
+  // Cloud provider info
+  cloudProvider   String   @default("timeweb")
+  cloudExternalId String?
+  cloudPresetId   Int?
+  provisionStatus String   @default("pending") // pending, provisioning, ready, error, upgrading
+
+  // Database credentials (filled after provisioning)
   dbHost      String?
   dbPort      Int?
   dbName      String?
   dbUser      String?
   dbPassword  String?
 
-  // Limits
+  // Plan/limits
+  planId      String   @default("free")
   dbSizeMb    Int      @default(500)
   storageMb   Int      @default(1000)
 
