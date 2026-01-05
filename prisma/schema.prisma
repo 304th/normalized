@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects Project[]
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  description String?
+  region      String   @default("ru-msk")
+
+  // Database info (would be real connection in prod)
+  dbHost      String?
+  dbPort      Int?
+  dbName      String?
+  dbUser      String?
+  dbPassword  String?
+
+  // Limits
+  dbSizeMb    Int      @default(500)
+  storageMb   Int      @default(1000)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKeys     ApiKey[]
+
+  @@index([userId])
+}
+
+model ApiKey {
+  id        String   @id @default(cuid())
+  name      String
+  key       String   @unique
+
+  // Permissions
+  canRead   Boolean  @default(true)
+  canWrite  Boolean  @default(true)
+
+  lastUsed  DateTime?
+  createdAt DateTime @default(now())
+
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@index([key])
+}
