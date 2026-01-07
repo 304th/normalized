@@ -199,6 +199,72 @@ export class TimewebCloudProvider implements CloudProvider {
     };
   }
 
+  // --- Shared cluster methods ---
+
+  /** Create a new cluster (without creating a database inside) */
+  async createCluster(
+    name: string,
+    presetId: number,
+    region: string
+  ): Promise<{ clusterId: number; host: string; port: number; login: string; password: string; status: string }> {
+    const password = this.generatePassword();
+    const clusterRes = await this.request<{ db_cluster: TimewebCluster }>(
+      "POST",
+      "/dbs",
+      {
+        name,
+        type: "postgres",
+        preset_id: presetId,
+        login: "admin",
+        password,
+        hash_type: "caching_sha2",
+      }
+    );
+
+    const cluster = clusterRes.db_cluster;
+    return {
+      clusterId: cluster.id,
+      host: cluster.host,
+      port: cluster.port,
+      login: cluster.login,
+      password: cluster.password,
+      status: cluster.status,
+    };
+  }
+
+  /** Add a database to an existing cluster */
+  async addDatabaseToCluster(
+    clusterId: number,
+    dbName: string
+  ): Promise<{ dbId: number; name: string }> {
+    const safeName = dbName.replace(/[^a-z0-9_]/gi, "_").slice(0, 32);
+    const dbRes = await this.request<{ db: TimewebDbInstance }>(
+      "POST",
+      `/dbs/${clusterId}/dbs`,
+      { name: safeName }
+    );
+    return { dbId: dbRes.db.id, name: dbRes.db.name };
+  }
+
+  /** Delete a database from a cluster (not the cluster itself) */
+  async deleteDatabaseFromCluster(clusterId: number, dbId: number): Promise<void> {
+    await this.request("DELETE", `/dbs/${clusterId}/dbs/${dbId}`);
+  }
+
+  /** Get cluster status */
+  async getClusterStatus(clusterId: number): Promise<ProvisionStatus> {
+    const res = await this.request<{ db_cluster: TimewebCluster }>(
+      "GET",
+      `/dbs/${clusterId}`
+    );
+    return this.mapStatus(res.db_cluster.status);
+  }
+
+  /** Delete entire cluster */
+  async deleteCluster(clusterId: number): Promise<void> {
+    await this.request("DELETE", `/dbs/${clusterId}`);
+  }
+
   private mapStatus(status: string): ProvisionStatus {
     const map: Record<string, ProvisionStatus> = {
       started: "ready",

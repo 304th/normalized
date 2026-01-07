@@ -1,3 +1,5 @@
+export type PoolType = "free" | "starter";
+
 export interface PlanConfig {
   id: string;
   name: string;
@@ -5,6 +7,8 @@ export interface PlanConfig {
   storageMb: number;
   priceMonthly: number; // kopecks
   timewebPresetId: number;
+  isShared?: boolean;
+  poolType?: PoolType; // Which shared cluster pool to use
 }
 
 // Upgrade causes brief downtime - DB restarts on new instance
@@ -14,15 +18,23 @@ export const UPGRADE_INFO = {
   dataPreserved: true,
 };
 
+// Shared cluster pool configs
+export const POOL_CONFIG = {
+  free: { maxDatabases: 300, presetId: 2 },    // 64MB × 300 = 19.2GB on 20GB cluster
+  starter: { maxDatabases: 4, presetId: 2 },   // 5GB × 4 = 20GB on 20GB cluster
+} as const;
+
 // Static plan definitions - maps to cloud provider presets
 export const PLANS: PlanConfig[] = [
   {
     id: "free",
     name: "Free",
-    dbSizeMb: 500,
-    storageMb: 1000,
+    dbSizeMb: 64,
+    storageMb: 256,
     priceMonthly: 0,
-    timewebPresetId: 1, // smallest preset
+    timewebPresetId: 2,
+    isShared: true,
+    poolType: "free",
   },
   {
     id: "starter",
@@ -31,6 +43,8 @@ export const PLANS: PlanConfig[] = [
     storageMb: 10000,
     priceMonthly: 99000, // 990 RUB
     timewebPresetId: 2,
+    isShared: true,
+    poolType: "starter",
   },
   {
     id: "pro",

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface ApiKey {
@@ -151,15 +151,45 @@ export default function DashboardPage() {
 
 const statusLabels: Record<string, { label: string; color: string }> = {
   pending: { label: "Ожидание", color: "text-gray-400 bg-gray-500/10" },
-  provisioning: { label: "Создание", color: "text-blue-400 bg-blue-500/10" },
+  provisioning: { label: "Создание...", color: "text-blue-400 bg-blue-500/10" },
+  upgrading: { label: "Обновление...", color: "text-yellow-400 bg-yellow-500/10" },
   ready: { label: "Готов", color: "text-green-400 bg-green-500/10" },
   error: { label: "Ошибка", color: "text-red-400 bg-red-500/10" },
 };
 
+async function pollProjectStatus(projectId: string): Promise<string> {
+  const res = await fetch(`/api/projects/${projectId}/status`);
+  if (!res.ok) return "error";
+  const data = await res.json();
+  return data.status;
+}
+
 function ProjectCard({ project }: { project: Project }) {
+  const queryClient = useQueryClient();
   const [showKey, setShowKey] = useState(false);
+  const [currentStatus, setCurrentStatus] = useState(project.provisionStatus);
   const apiKey = project.apiKeys[0]?.key || "";
-  const status = statusLabels[project.provisionStatus] ?? statusLabels.pending;
+  const status = statusLabels[currentStatus] ?? statusLabels.pending;
+
+  // Poll status for provisioning/upgrading projects
+  const shouldPoll = currentStatus === "provisioning" || currentStatus === "upgrading";
+
+  useEffect(() => {
+    if (!shouldPoll) return;
+
+    const interval = setInterval(async () => {
+      const newStatus = await pollProjectStatus(project.id);
+      if (newStatus !== currentStatus) {
+        setCurrentStatus(newStatus);
+        // Refresh projects list when status changes to ready
+        if (newStatus === "ready" || newStatus === "error") {
+          queryClient.invalidateQueries({ queryKey: ["projects"] });
+        }
+      }
+    }, 3000); // Poll every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [project.id, currentStatus, shouldPoll, queryClient]);
 
   return (
     <div className="border border-[var(--border)] rounded-xl p-5 hover:border-[var(--accent)]/50 transition-colors">

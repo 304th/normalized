@@ -27,9 +27,14 @@ model Project {
 
   // Cloud provider info
   cloudProvider   String   @default("timeweb")
-  cloudExternalId String?
+  cloudExternalId String?  // For dedicated clusters: "clusterId:dbId"
   cloudPresetId   Int?
   provisionStatus String   @default("pending") // pending, provisioning, ready, error, upgrading
+
+  // Shared cluster (for free tier)
+  sharedClusterId String?
+  sharedCluster   SharedCluster? @relation(fields: [sharedClusterId], references: [id])
+  timewebDbId     Int?           // DB instance ID within shared cluster
 
   // Database credentials (filled after provisioning)
   dbHost      String?
@@ -40,8 +45,8 @@ model Project {
 
   // Plan/limits
   planId      String   @default("free")
-  dbSizeMb    Int      @default(500)
-  storageMb   Int      @default(1000)
+  dbSizeMb    Int      @default(64)
+  storageMb   Int      @default(256)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -51,6 +56,35 @@ model Project {
   apiKeys     ApiKey[]
 
   @@index([userId])
+  @@index([sharedClusterId])
+}
+
+model SharedCluster {
+  id               String   @id @default(cuid())
+  timewebClusterId Int      @unique
+  region           String   @default("ru-msk")
+  presetId         Int
+  poolType         String   @default("free") // "free" or "starter"
+
+  // Capacity
+  maxDatabases     Int      @default(300)
+  dbCount          Int      @default(0)
+
+  // Cluster credentials
+  host             String
+  port             Int
+  adminUser        String
+  adminPassword    String
+
+  // Status: provisioning, ready, full, draining
+  status           String   @default("provisioning")
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  projects         Project[]
+
+  @@index([region, poolType, status])
 }
 
 model ApiKey {

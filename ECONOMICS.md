@@ -2,11 +2,12 @@
 
 ## Pricing Tiers
 
-| Tier | Monthly | Annual | Database | Storage | Requests |
-|------|---------|--------|----------|---------|----------|
-| Free | 0 ₽ | 0 ₽ | 500 MB | 1 GB | 50k/mo |
-| Pro | 1,490 ₽ | 17,880 ₽ | 8 GB | 50 GB | Unlimited |
-| Team | 4,990 ₽ | 59,880 ₽ | 32 GB | 200 GB | Unlimited |
+| Tier | Monthly | Annual | Database | Storage | Cluster |
+|------|---------|--------|----------|---------|---------|
+| Free | 0 ₽ | 0 ₽ | 64 MB | 256 MB | Shared (300/cluster) |
+| Starter | 990 ₽ | 11,880 ₽ | 5 GB | 10 GB | Shared (4/cluster) |
+| Pro | 2,990 ₽ | 35,880 ₽ | 20 GB | 50 GB | Dedicated |
+| Business | 9,990 ₽ | 119,880 ₽ | 100 GB | 200 GB | Dedicated |
 
 ---
 
@@ -136,29 +137,39 @@ VK Cloud example: 4 vCPU + 8GB RAM + 150GB SSD = ~355 ₽/day = ~11,600 ₽/mo
 
 ## Per-User Unit Economics
 
-### Optimized Model (Timeweb/Selectel)
+### Cluster Architecture
 
-| Tier | DB | Storage | Backup | BW | **COGS** | Revenue | **Margin** |
-|------|-----|---------|--------|-----|----------|---------|------------|
-| Free | 15 ₽ | 1 ₽ | 1 ₽ | 3 ₽ | 20 ₽ | 0 ₽ | **-20 ₽** |
-| Pro | 250 ₽ | 40 ₽ | 10 ₽ | 30 ₽ | 330 ₽ | 1,490 ₽ | **+1,160 ₽ (78%)** |
-| Team | 1,000 ₽ | 160 ₽ | 40 ₽ | 100 ₽ | 1,300 ₽ | 4,990 ₽ | **+3,690 ₽ (74%)** |
+| Tier | Cluster Type | Users/Cluster | DB | Timeweb Preset |
+|------|--------------|---------------|-----|----------------|
+| Free | Shared | 300 | 64 MB | #2 (20GB) |
+| Starter | Shared | 4 | 5 GB | #2 (20GB) |
+| Pro | Dedicated | 1 | 20 GB | #3 (40GB) |
+| Business | Dedicated | 1 | 100 GB | #4 (120GB) |
 
-### Standard Model (VK Cloud)
+### Unit Economics (Timeweb)
 
-| Tier | DB | Storage | Backup | BW | **COGS** | Revenue | **Margin** |
-|------|-----|---------|--------|-----|----------|---------|------------|
-| Free | 25 ₽ | 2 ₽ | 1 ₽ | 5 ₽ | 33 ₽ | 0 ₽ | **-33 ₽** |
-| Pro | 400 ₽ | 80 ₽ | 15 ₽ | 50 ₽ | 545 ₽ | 1,490 ₽ | **+945 ₽ (63%)** |
-| Team | 1,600 ₽ | 320 ₽ | 60 ₽ | 150 ₽ | 2,130 ₽ | 4,990 ₽ | **+2,860 ₽ (57%)** |
+| Tier | DB | Storage | BW | **COGS** | Revenue | **Margin** |
+|------|-----|---------|-----|----------|---------|------------|
+| Free | 2.6 ₽ | 0.2 ₽ | 3 ₽ | **6 ₽** | 0 ₽ | **-6 ₽** |
+| Starter | 198 ₽ | 8 ₽ | 15 ₽ | **221 ₽** | 990 ₽ | **+769 ₽ (78%)** |
+| Pro | 1,200 ₽ | 40 ₽ | 30 ₽ | **1,270 ₽** | 2,990 ₽ | **+1,720 ₽ (58%)** |
+| Business | 3,500 ₽ | 160 ₽ | 100 ₽ | **3,760 ₽** | 9,990 ₽ | **+6,230 ₽ (62%)** |
 
-### Premium Model (Yandex/Cloud.ru)
+**DB cost breakdown:**
+- Free: 790₽ cluster ÷ 300 users = 2.6₽/user
+- Starter: 790₽ cluster ÷ 4 users = 198₽/user
+- Pro: ~1,200₽ dedicated (40GB preset)
+- Business: ~3,500₽ dedicated (120GB preset)
 
-| Tier | DB | Storage | Backup | BW | **COGS** | Revenue | **Margin** |
-|------|-----|---------|--------|-----|----------|---------|------------|
-| Free | 50 ₽ | 3 ₽ | 2 ₽ | 5 ₽ | 60 ₽ | 0 ₽ | **-60 ₽** |
-| Pro | 800 ₽ | 100 ₽ | 20 ₽ | 60 ₽ | 980 ₽ | 1,490 ₽ | **+510 ₽ (34%)** |
-| Team | 3,200 ₽ | 400 ₽ | 80 ₽ | 180 ₽ | 3,860 ₽ | 4,990 ₽ | **+1,130 ₽ (23%)** |
+### Blended Margin Analysis
+
+Assuming typical user distribution (85% Free, 10% Starter, 4% Pro, 1% Business):
+
+| Metric | Per 100 Users |
+|--------|---------------|
+| Revenue | 9,900 + 11,960 + 9,990 = **31,850 ₽** |
+| COGS | 510 + 2,210 + 5,080 + 3,760 = **11,560 ₽** |
+| Gross Margin | **20,290 ₽ (64%)** |
 
 ---
 
@@ -179,30 +190,30 @@ VK Cloud example: 4 vCPU + 8GB RAM + 150GB SSD = ~355 ₽/day = ~11,600 ₽/mo
 
 ### Scenario A: Solo, budget infra (3k ₽ fixed)
 
-| Users (F/P/T) | Revenue | COGS | Fixed | **Net** |
-|---------------|---------|------|-------|---------|
-| 50/3/0 | 4,470 ₽ | 1,990 ₽ | 3,000 ₽ | **-520 ₽** |
-| 100/5/1 | 12,440 ₽ | 4,300 ₽ | 3,000 ₽ | **+5,140 ₽** |
+| Users (F/S/P/B) | Revenue | COGS | Fixed | **Net** |
+|-----------------|---------|------|-------|---------|
+| 50/2/1/0 | 4,970 ₽ | 1,972 ₽ | 3,000 ₽ | **-2 ₽** |
+| 100/5/2/0 | 10,930 ₽ | 3,645 ₽ | 3,000 ₽ | **+4,285 ₽** |
 
-**Break-even: ~3 Pro users**
+**Break-even: ~2 Starter + 1 Pro user**
 
 ### Scenario B: Standard (35k ₽ fixed)
 
-| Users (F/P/T) | Revenue | COGS | Fixed | **Net** |
-|---------------|---------|------|-------|---------|
-| 200/20/5 | 54,750 ₽ | 18,960 ₽ | 35,000 ₽ | **+790 ₽** |
-| 500/50/15 | 149,350 ₽ | 51,800 ₽ | 35,000 ₽ | **+62,550 ₽** |
+| Users (F/S/P/B) | Revenue | COGS | Fixed | **Net** |
+|-----------------|---------|------|-------|---------|
+| 200/15/8/2 | 58,650 ₽ | 17,785 ₽ | 35,000 ₽ | **+5,865 ₽** |
+| 500/40/20/5 | 159,100 ₽ | 48,770 ₽ | 35,000 ₽ | **+75,330 ₽** |
 
-**Break-even: ~20 Pro users**
+**Break-even: ~12 Pro users** or ~40 Starter users
 
 ### Scenario C: Growth (100k ₽ fixed)
 
-| Users (F/P/T) | Revenue | COGS | Fixed | **Net** |
-|---------------|---------|------|-------|---------|
-| 1000/100/30 | 298,700 ₽ | 128,200 ₽ | 100,000 ₽ | **+70,500 ₽** |
-| 2000/200/50 | 547,400 ₽ | 232,400 ₽ | 100,000 ₽ | **+215,000 ₽** |
+| Users (F/S/P/B) | Revenue | COGS | Fixed | **Net** |
+|-----------------|---------|------|-------|---------|
+| 1000/80/40/10 | 228,200 ₽ | 81,300 ₽ | 100,000 ₽ | **+46,900 ₽** |
+| 2000/180/80/20 | 477,000 ₽ | 166,050 ₽ | 100,000 ₽ | **+210,950 ₽** |
 
-**Break-even: ~70 Pro users**
+**Break-even: ~60 Pro users** or ~130 Starter users
 
 ---
 
@@ -210,32 +221,36 @@ VK Cloud example: 4 vCPU + 8GB RAM + 150GB SSD = ~355 ₽/day = ~11,600 ₽/mo
 
 | Metric | Target |
 |--------|--------|
-| Free → Pro conversion | 5-10% |
+| Free → Starter conversion | 8-12% |
+| Starter → Pro upgrade | 15-20% |
+| Monthly churn (Starter) | < 8% |
 | Monthly churn (Pro) | < 5% |
-| Monthly churn (Team) | < 3% |
-| LTV Pro (12mo avg) | 12,000 ₽ |
-| LTV Team (18mo avg) | 90,000 ₽ |
-| CAC Pro | < 4,000 ₽ |
-| CAC Team | < 30,000 ₽ |
-| LTV:CAC ratio | > 3:1 |
-| Payback period | < 4 months |
+| Monthly churn (Business) | < 3% |
+| LTV Starter (10mo avg) | 9,900 ₽ |
+| LTV Pro (14mo avg) | 41,860 ₽ |
+| LTV Business (24mo avg) | 239,760 ₽ |
+| CAC Starter | < 2,000 ₽ |
+| CAC Pro | < 10,000 ₽ |
+| LTV:CAC ratio | > 4:1 |
+| Payback period | < 3 months |
 
 ---
 
 ## 12-Month Projections
 
-| Stage | Month | Users (F/P/T) | MRR | Costs | Profit/mo |
-|-------|-------|---------------|-----|-------|-----------|
-| MVP | 1-3 | 100/5/1 | 12,440 ₽ | 15,000 ₽ | -2,560 ₽ |
-| Seed | 4-6 | 300/20/5 | 54,750 ₽ | 25,000 ₽ | +29,750 ₽ |
-| Traction | 7-9 | 800/60/15 | 164,250 ₽ | 50,000 ₽ | +114,250 ₽ |
-| Growth | 10-12 | 2000/150/40 | 423,350 ₽ | 80,000 ₽ | +343,350 ₽ |
+| Stage | Month | Users (F/S/P/B) | MRR | COGS | Fixed | Profit/mo |
+|-------|-------|-----------------|-----|------|-------|-----------|
+| MVP | 1-3 | 100/8/2/0 | 13,900 ₽ | 4,408 ₽ | 5,000 ₽ | +4,492 ₽ |
+| Seed | 4-6 | 300/25/8/2 | 72,630 ₽ | 21,255 ₽ | 15,000 ₽ | +36,375 ₽ |
+| Traction | 7-9 | 800/60/25/5 | 174,150 ₽ | 56,265 ₽ | 35,000 ₽ | +82,885 ₽ |
+| Growth | 10-12 | 2000/150/60/15 | 446,400 ₽ | 143,460 ₽ | 60,000 ₽ | +242,940 ₽ |
 
 **Year 1 totals:**
-- Total revenue: ~2,400,000 ₽
-- Total costs: ~600,000 ₽
-- Net profit: ~1,800,000 ₽
-- Required runway: 20,000-50,000 ₽ (months 1-3)
+- Total revenue: ~2,600,000 ₽
+- Total COGS: ~800,000 ₽
+- Fixed costs: ~400,000 ₽
+- Net profit: ~1,400,000 ₽
+- Required runway: 10,000 ₽ (months 1-2 buffer)
 
 ---
 
@@ -243,9 +258,10 @@ VK Cloud example: 4 vCPU + 8GB RAM + 150GB SSD = ~355 ₽/day = ~11,600 ₽/mo
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Low conversion (F→P) | High | onboarding, feature gates |
-| High churn | High | support, feature parity |
-| DB cost overruns | Medium | resource limits, overage billing |
+| Low conversion (F→S) | High | onboarding, feature gates, Starter trial |
+| Starter churn | High | usage alerts, upgrade nudges |
+| Shared cluster full | Medium | auto-scale pools, provisioning queue |
+| Migration failures | Medium | pg_dump retry, manual fallback |
 | 152-FZ compliance | Medium | legal counsel |
 | Competition | Medium | local support, RU-first |
 | Provider price hikes | Low | multi-cloud ready |

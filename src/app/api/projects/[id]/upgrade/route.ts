@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
-import { getCloudProvider } from "@/lib/cloud";
 import { getPlan, canUpgrade } from "@/lib/plans";
+import { migrateSharedToDedicated, resizeDedicated } from "@/lib/cloud/migrations";
 import { NextResponse } from "next/server";
 
 export async function POST(
@@ -37,6 +37,7 @@ export async function POST(
     }
 
     // Validate plan upgrade
+    const currentPlan = getPlan(project.planId);
     const newPlan = getPlan(planId);
     if (!newPlan) {
       return NextResponse.json(
@@ -60,22 +61,24 @@ export async function POST(
       );
     }
 
-    if (!project.cloudExternalId) {
+    // Determine migration path
+    const isFromShared = currentPlan?.isShared && project.sharedClusterId;
+    const isToDedicated = !newPlan.isShared;
+
+    if (isFromShared && isToDedicated) {
+      // Shared (Free/Starter) → Dedicated (Pro/Business): migrate cluster
+      migrateSharedToDedicated(project.id, planId)
+        .catch((err) => console.error(`Migration failed for ${id}:`, err));
+    } else if (project.cloudExternalId) {
+      // Paid → Higher Paid: resize existing cluster
+      resizeDedicated(project.id, planId)
+        .catch((err) => console.error(`Resize failed for ${id}:`, err));
+    } else {
       return NextResponse.json(
         { error: "База данных не создана" },
         { status: 400 }
       );
     }
-
-    // Update status to upgrading
-    await prisma.project.update({
-      where: { id },
-      data: { provisionStatus: "upgrading" },
-    });
-
-    // Trigger resize async
-    upgradeDatabase(project.id, project.cloudExternalId, newPlan.timewebPresetId, planId)
-      .catch((err) => console.error(`Upgrade failed for ${id}:`, err));
 
     return NextResponse.json({
       success: true,
@@ -84,36 +87,5 @@ export async function POST(
   } catch (error) {
     console.error("Upgrade error:", error);
     return NextResponse.json({ error: "Ошибка сервера" }, { status: 500 });
-  }
-}
-
-async function upgradeDatabase(
-  projectId: string,
-  externalId: string,
-  presetId: number,
-  planId: string
-) {
-  try {
-    const provider = getCloudProvider();
-    const status = await provider.resizeDatabase(externalId, presetId);
-
-    const plan = getPlan(planId)!;
-
-    await prisma.project.update({
-      where: { id: projectId },
-      data: {
-        provisionStatus: status === "upgrading" ? "upgrading" : "ready",
-        planId,
-        cloudPresetId: presetId,
-        dbSizeMb: plan.dbSizeMb,
-        storageMb: plan.storageMb,
-      },
-    });
-  } catch (error) {
-    console.error("Upgrade error:", error);
-    await prisma.project.update({
-      where: { id: projectId },
-      data: { provisionStatus: "error" },
-    });
   }
 }
