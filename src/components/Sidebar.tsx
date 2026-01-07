@@ -3,49 +3,62 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-const navSections = [
-  {
-    title: "Проект",
-    items: [
-      { name: "Обзор", href: "/dashboard", icon: HomeIcon },
-    ],
-  },
-  {
-    title: "База данных",
-    items: [
-      { name: "Таблицы", href: "/dashboard/database/tables", icon: TableIcon },
-      { name: "SQL редактор", href: "/dashboard/database/sql", icon: CodeIcon },
-      { name: "Миграции", href: "/dashboard/database/migrations", icon: ArrowIcon },
-      { name: "Бэкапы", href: "/dashboard/database/backups", icon: BackupIcon },
-    ],
-  },
-  {
-    title: "Аутентификация",
-    items: [
-      { name: "Пользователи", href: "/dashboard/auth/users", icon: UsersIcon },
-      { name: "Политики", href: "/dashboard/auth/policies", icon: ShieldIcon },
-      { name: "Провайдеры", href: "/dashboard/auth/providers", icon: KeyIcon },
-      { name: "Шаблоны", href: "/dashboard/auth/templates", icon: MailIcon },
-    ],
-  },
-  {
-    title: "Хранилище",
-    items: [
-      { name: "Файлы", href: "/dashboard/storage/files", icon: FolderIcon },
-      { name: "Бакеты", href: "/dashboard/storage/buckets", icon: BucketIcon },
-      { name: "Политики", href: "/dashboard/storage/policies", icon: ShieldIcon },
-    ],
-  },
-];
+function getNavSections(projectId: string) {
+  return [
+    {
+      title: "Проект",
+      items: [
+        { name: "Обзор", href: `/dashboard/${projectId}`, icon: HomeIcon },
+      ],
+    },
+    {
+      title: "База данных",
+      items: [
+        { name: "Таблицы", href: `/dashboard/${projectId}/database/tables`, icon: TableIcon },
+        { name: "SQL редактор", href: `/dashboard/${projectId}/database/sql`, icon: CodeIcon },
+        { name: "Миграции", href: `/dashboard/${projectId}/database/migrations`, icon: ArrowIcon },
+        { name: "Бэкапы", href: `/dashboard/${projectId}/database/backups`, icon: BackupIcon },
+      ],
+    },
+    {
+      title: "Аутентификация",
+      items: [
+        { name: "Пользователи", href: `/dashboard/${projectId}/auth/users`, icon: UsersIcon },
+        { name: "Политики", href: `/dashboard/${projectId}/auth/policies`, icon: ShieldIcon },
+        { name: "Провайдеры", href: `/dashboard/${projectId}/auth/providers`, icon: KeyIcon },
+        { name: "Шаблоны", href: `/dashboard/${projectId}/auth/templates`, icon: MailIcon },
+      ],
+    },
+    {
+      title: "Хранилище",
+      items: [
+        { name: "Файлы", href: `/dashboard/${projectId}/storage/files`, icon: FolderIcon },
+        { name: "Бакеты", href: `/dashboard/${projectId}/storage/buckets`, icon: BucketIcon },
+        { name: "Политики", href: `/dashboard/${projectId}/storage/policies`, icon: ShieldIcon },
+      ],
+    },
+  ];
+}
 
-export default function Sidebar() {
+interface SidebarProps {
+  projectId: string;
+}
+
+export default function Sidebar({ projectId }: SidebarProps) {
   const pathname = usePathname();
+  const navSections = getNavSections(projectId);
 
   return (
-    <aside className="w-56 min-h-screen border-r border-[var(--border)] bg-[#0c0c0e] flex flex-col">
+    <aside className="w-56 min-h-screen border-r border-[var(--border)] bg-[var(--card-dark)] flex flex-col">
       {/* Logo */}
       <div className="h-14 px-4 flex items-center border-b border-[var(--border)]">
-        <Link href="/dashboard" className="font-semibold text-sm">
+        <Link href="/dashboard" className="font-semibold text-sm flex items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="4" width="10" height="10" rx="2" fill="var(--accent)" />
+            <rect x="18" y="4" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.6" />
+            <rect x="4" y="18" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.6" />
+            <rect x="18" y="18" width="10" height="10" rx="2" fill="var(--accent)" opacity="0.3" />
+          </svg>
           normalized
         </Link>
       </div>
@@ -69,7 +82,7 @@ export default function Sidebar() {
                       className={`flex items-center gap-2.5 px-4 py-2 text-sm transition-colors ${
                         isActive
                           ? "bg-[var(--accent)]/10 text-[var(--accent)] border-r-2 border-[var(--accent)]"
-                          : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[#18181b]"
+                          : "text-[var(--muted)] hover:text-[var(--foreground)] hover:bg-[var(--card)]"
                       }`}
                     >
                       <item.icon className="w-4 h-4" />
@@ -86,7 +99,7 @@ export default function Sidebar() {
       {/* Settings */}
       <div className="border-t border-[var(--border)] p-4">
         <Link
-          href="/dashboard/settings"
+          href={`/dashboard/${projectId}/settings`}
           className="flex items-center gap-2.5 text-sm text-[var(--muted)] hover:text-[var(--foreground)] transition-colors"
         >
           <SettingsIcon className="w-4 h-4" />

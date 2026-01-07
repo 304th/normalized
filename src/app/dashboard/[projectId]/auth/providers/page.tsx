@@ -19,7 +19,7 @@ export default function ProvidersPage() {
             className="border border-[var(--border)] rounded-xl p-4 flex items-center justify-between"
           >
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-[#18181b] rounded-lg flex items-center justify-center text-xs">
+              <div className="w-8 h-8 bg-[var(--card)] rounded-lg flex items-center justify-center text-xs">
                 {p.name[0]}
               </div>
               <span className="font-medium">{p.name}</span>

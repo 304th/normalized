@@ -10,7 +10,7 @@ export default function UsersPage() {
       </div>
       <div className="border border-[var(--border)] rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-[#0c0c0e]">
+          <thead className="bg-[var(--card-dark)]">
             <tr className="border-b border-[var(--border)]">
               <th className="px-4 py-3 text-left text-[var(--muted)] font-medium">Email</th>
               <th className="px-4 py-3 text-left text-[var(--muted)] font-medium">Создан</th>

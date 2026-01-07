@@ -55,7 +55,7 @@ export default function SignupPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-[#18181b] border border-[var(--border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--accent)] transition-colors"
+              className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--accent)] transition-colors"
               placeholder="Иван"
             />
           </div>
@@ -67,7 +67,7 @@ export default function SignupPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full bg-[#18181b] border border-[var(--border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--accent)] transition-colors"
+              className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--accent)] transition-colors"
               placeholder="you@example.com"
             />
           </div>
@@ -80,7 +80,7 @@ export default function SignupPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={8}
-              className="w-full bg-[#18181b] border border-[var(--border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--accent)] transition-colors"
+              className="w-full bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-3 focus:outline-none focus:border-[var(--accent)] transition-colors"
               placeholder="••••••••"
             />
           </div>

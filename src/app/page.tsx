@@ -74,7 +74,7 @@ export default function Home() {
       {/* Code preview */}
       <section className="pb-20 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="bg-[#18181b] rounded-xl border border-[var(--border)] overflow-hidden">
+          <div className="bg-[var(--card)] rounded-xl border border-[var(--border)] overflow-hidden">
             <div className="flex items-center gap-2 px-4 py-3 border-b border-[var(--border)]">
               <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
               <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
@@ -137,26 +137,31 @@ const { url } = await db.storage
 
       {/* Pricing preview */}
       <section className="py-20 px-6 border-t border-[var(--border)]">
-        <div className="max-w-4xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Простые цены</h2>
           <p className="text-[var(--muted)] mb-12">Начните бесплатно, платите по мере роста</p>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <PricingCard
               name="Free"
               price="0"
-              features={["500 MB база данных", "1 GB хранилище", "50k запросов/мес"]}
+              features={["64 MB база данных", "256 MB хранилище", "Shared cluster"]}
+            />
+            <PricingCard
+              name="Starter"
+              price="990"
+              features={["5 GB база данных", "10 GB хранилище", "Shared cluster"]}
             />
             <PricingCard
               name="Pro"
-              price="1,490"
-              features={["8 GB база данных", "50 GB хранилище", "Безлимит запросов"]}
+              price="2,990"
+              features={["20 GB база данных", "50 GB хранилище", "Dedicated cluster"]}
               highlighted
             />
             <PricingCard
-              name="Team"
-              price="4,990"
-              features={["32 GB база данных", "200 GB хранилище", "Branching, SSO"]}
+              name="Business"
+              price="9,990"
+              features={["100 GB база данных", "200 GB хранилище", "Dedicated + SLA"]}
             />
           </div>
         </div>

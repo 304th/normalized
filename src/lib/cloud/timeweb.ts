@@ -265,6 +265,91 @@ export class TimewebCloudProvider implements CloudProvider {
     await this.request("DELETE", `/dbs/${clusterId}`);
   }
 
+  // --- S3 Storage methods ---
+
+  /** Create S3 bucket */
+  async createBucket(
+    name: string,
+    isPublic: boolean,
+    presetId: number = 1
+  ): Promise<{
+    bucketId: number;
+    accessKey: string;
+    secretKey: string;
+    endpoint: string;
+    bucketName: string;
+  }> {
+    const res = await this.request<{
+      bucket: {
+        id: number;
+        name: string;
+        type: string;
+        preset_id: number;
+        status: string;
+        access_key: string;
+        secret_key: string;
+        hostname: string;
+      };
+    }>("POST", "/storages/buckets", {
+      name,
+      type: isPublic ? "public" : "private",
+      preset_id: presetId,
+    });
+
+    return {
+      bucketId: res.bucket.id,
+      accessKey: res.bucket.access_key,
+      secretKey: res.bucket.secret_key,
+      endpoint: `https://${res.bucket.hostname}`,
+      bucketName: res.bucket.name,
+    };
+  }
+
+  /** Delete S3 bucket */
+  async deleteBucket(bucketId: number): Promise<void> {
+    await this.request("DELETE", `/storages/buckets/${bucketId}`);
+  }
+
+  /** Get bucket info */
+  async getBucket(bucketId: number): Promise<{
+    id: number;
+    name: string;
+    type: string;
+    accessKey: string;
+    secretKey: string;
+    endpoint: string;
+    usedSpace: number;
+  }> {
+    const res = await this.request<{
+      bucket: {
+        id: number;
+        name: string;
+        type: string;
+        access_key: string;
+        secret_key: string;
+        hostname: string;
+        used_space: number;
+      };
+    }>("GET", `/storages/buckets/${bucketId}`);
+
+    return {
+      id: res.bucket.id,
+      name: res.bucket.name,
+      type: res.bucket.type,
+      accessKey: res.bucket.access_key,
+      secretKey: res.bucket.secret_key,
+      endpoint: `https://${res.bucket.hostname}`,
+      usedSpace: res.bucket.used_space,
+    };
+  }
+
+  /** Update bucket type (public/private) */
+  async updateBucket(bucketId: number, isPublic: boolean): Promise<void> {
+    await this.request("PATCH", `/storages/buckets/${bucketId}`, {
+      type: isPublic ? "public" : "private",
+    });
+  }
+
   private mapStatus(status: string): ProvisionStatus {
     const map: Record<string, ProvisionStatus> = {
       started: "ready",

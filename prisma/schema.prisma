@@ -54,6 +54,7 @@ model Project {
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   apiKeys     ApiKey[]
+  buckets     Bucket[]
 
   @@index([userId])
   @@index([sharedClusterId])
@@ -104,4 +105,31 @@ model ApiKey {
 
   @@index([projectId])
   @@index([key])
+}
+
+model Bucket {
+  id            String   @id @default(cuid())
+  name          String
+  isPublic      Boolean  @default(false)
+  maxFileSizeMb Int?     // null = no limit
+  allowedMimes  String[] // empty = allow all
+
+  // Timeweb S3 credentials
+  timewebBucketId Int?     @unique
+  accessKey       String?
+  secretKey       String?
+  endpoint        String?  @default("https://s3.timeweb.cloud")
+
+  // Stats
+  sizeBytes       BigInt   @default(0)
+  fileCount       Int      @default(0)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  projectId       String
+  project         Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, name])
+  @@index([projectId])
 }

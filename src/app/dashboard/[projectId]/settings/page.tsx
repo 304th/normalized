@@ -92,7 +92,7 @@ export default function SettingsPage() {
           {conn ? (
             <div className="space-y-1">
               {/* Connection URL */}
-              <div className="bg-[#18181b] rounded-lg p-4 mb-4">
+              <div className="bg-[var(--card)] rounded-lg p-4 mb-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-xs text-[var(--muted)]">Connection URL</span>
                   <CopyButton text={conn.url} />
@@ -129,7 +129,7 @@ export default function SettingsPage() {
               <input
                 type="text"
                 defaultValue={project?.name || ""}
-                className="w-full max-w-md bg-[#18181b] border border-[var(--border)] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
+                className="w-full max-w-md bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
               />
             </div>
             <div>
@@ -138,7 +138,7 @@ export default function SettingsPage() {
               </label>
               <select
                 defaultValue={project?.region || "ru-msk"}
-                className="bg-[#18181b] border border-[var(--border)] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
+                className="bg-[var(--card)] border border-[var(--border)] rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[var(--accent)]"
               >
                 <option value="ru-msk">ru-msk (Москва)</option>
                 <option value="ru-spb">ru-spb (Санкт-Петербург)</option>
